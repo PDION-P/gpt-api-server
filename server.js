@@ -1,35 +1,31 @@
 
-// server.js
-
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const { Configuration, OpenAIApi } = require('openai');
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import OpenAI from 'openai';
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY, // Render 환경변수에 입력
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
-const openai = new OpenAIApi(configuration);
 
 app.post('/generate', async (req, res) => {
-  const { prompt } = req.body;
-
   try {
-    const completion = await openai.createChatCompletion({
+    const { prompt } = req.body;
+    const chat = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
+      messages: [{ role: "user", content: prompt }]
     });
-
-    res.json({ text: completion.data.choices[0].message.content });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.json({ result: chat.choices[0].message.content });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error generating response.' });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`GPT API server running on port ${PORT}`));
+app.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
