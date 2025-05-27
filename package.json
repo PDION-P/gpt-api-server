@@ -1,0 +1,16 @@
+
+{
+  "name": "gpt-api-server",
+  "version": "1.0.0",
+  "description": "Simple GPT API server for Render deployment",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "openai": "^4.0.0"
+  }
+}
