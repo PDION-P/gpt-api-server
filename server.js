@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -16,7 +15,7 @@ app.post('/generate', async (req, res) => {
   try {
     const { prompt } = req.body;
     const chat = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o",  
       messages: [{ role: "user", content: prompt }]
     });
     res.json({ result: chat.choices[0].message.content });
