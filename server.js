@@ -1,7 +1,8 @@
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import OpenAI from 'openai';
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const OpenAI = require('openai');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const app = express();
 app.use(cors());
@@ -11,7 +12,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// 기존 GPT 응답 생성 API
+// GPT 응답 생성 API (선택적)
 app.post('/generate', async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -26,7 +27,7 @@ app.post('/generate', async (req, res) => {
   }
 });
 
-// ✅ DM 파싱용 API 추가
+// ✅ DM 파싱 API
 app.post('/parse-dm', async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'text 필드가 필요합니다.' });
@@ -37,16 +38,13 @@ app.post('/parse-dm', async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "사용자의 DM 내용을 분석하여 JSON 형식으로 반환하세요. 예시 형식: {\"name\":\"홍길동\", \"phone\":\"010-1234-5678\", \"addr\":\"서울시 강남구 ...\", \"product\":\"청바지\", \"opt1\":\"화이트\", \"opt2\":\"M\", \"qty\":1}"
+          content: "사용자의 DM 내용을 분석하여 JSON 형식으로 반환하세요. 예시: {\"name\":\"홍길동\", \"phone\":\"010-1234-5678\", \"addr\":\"서울시 강남구...\", \"product\":\"청바지\", \"opt1\":\"화이트\", \"opt2\":\"M\", \"qty\":1}"
         },
-        {
-          role: "user",
-          content: text
-        }
+        { role: "user", content: text }
       ]
     });
 
-    const json = completion.choices[0].message.content;
+    const json = completion.choices[0].message.content.trim();
     const result = JSON.parse(json);
     res.json(result);
   } catch (err) {
@@ -55,7 +53,7 @@ app.post('/parse-dm', async (req, res) => {
   }
 });
 
-// 우편번호 API 프록시
+// ✅ 우편번호 API 프록시
 app.get('/get-zipcode', async (req, res) => {
   const { addr } = req.query;
   if (!addr) return res.status(400).send("주소 입력 필요");
@@ -75,6 +73,12 @@ app.get('/get-zipcode', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server listening on port 3000');
+// 기본 응답
+app.get('/', (req, res) => {
+  res.send("GPT API Server is running");
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
