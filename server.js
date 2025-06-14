@@ -53,13 +53,13 @@ app.post('/parse-dm', async (req, res) => {
   }
 });
 
-// 우편번호 프록시 API
+// ✅ 우편번호 프록시 API (오타 수정됨)
 app.get('/get-zipcode', async (req, res) => {
   const { addr } = req.query;
   if (!addr) return res.status(400).send('주소 입력 필요');
 
   const serviceKey = 'q6%2FwjlJ53TvYhwCZ5wbyDG28aIl96sURWIUSqj3oI%2FFqvYG8XuD1n59Toi0Ydo%2F6MsGrSSDhotATOFdL7NPAyg%3D%3D';
-  const url = `http://openapi.epost.go.kr/postal/retrieveNewAdressAreaCdService/retrieveNewAdressAreaCdService/getNewAddressListAreaCd?serviceKey=${serviceKey}&searchSe=road&srchwrd=${encodeURIComponent(addr)}&countPerPage=1&currentPage=1`;
+  const url = `http://openapi.epost.go.kr/postal/retrieveNewAddressAreaCdService/retrieveNewAddressAreaCdService/getNewAddressListAreaCd?serviceKey=${serviceKey}&searchSe=road&srchwrd=${encodeURIComponent(addr)}&countPerPage=1&currentPage=1`;
 
   try {
     const response = await axios.get(url);
@@ -76,6 +76,7 @@ app.get('/', (req, res) => {
   res.send('GPT API Server is running');
 });
 
+// Render에서 사용하는 포트와 호스트 설정
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
